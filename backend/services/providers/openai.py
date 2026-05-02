@@ -169,9 +169,10 @@ class OpenAILLMProvider(LLMProvider):
             
             response = await self._client.chat.completions.create(**create_kwargs)
             async for chunk in response:
-                content = chunk.choices[0].delta.content
-                if content:
-                    yield content
+                if chunk.choices:
+                    content = chunk.choices[0].delta.content
+                    if content:
+                        yield content
 
         except openai.APIError as exc:
             raise _classify_openai_error(exc) from exc

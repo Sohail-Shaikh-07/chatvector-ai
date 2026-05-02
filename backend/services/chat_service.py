@@ -253,8 +253,8 @@ async def answer_question_stream_for_document(
             err = _structured_error_from_llm_answer(chunk)
             if err is not None:
                 yield f"event: error\ndata: {json.dumps(err['message'])}\n\n"
-            else:
-                yield f"event: token\ndata: {json.dumps(chunk)}\n\n"
+                return
+            yield f"event: token\ndata: {json.dumps(chunk)}\n\n"
 
         yield "event: done\ndata: [DONE]\n\n"
         logger.info(f"Answer stream generated successfully for document {doc_id}")

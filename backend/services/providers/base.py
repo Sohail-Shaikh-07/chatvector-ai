@@ -136,7 +136,6 @@ class LLMProvider(ABC):
             format and ignores unrecognised keys.
         """
 
-    @abstractmethod
     async def generate_stream(
         self,
         prompt: str,
@@ -155,4 +154,7 @@ class LLMProvider(ABC):
             sequences).  Each provider maps relevant keys to its SDK
             format and ignores unrecognised keys.
         """
+        raise ProviderError("Streaming is not supported by this provider.")
+        yield ""  # to satisfy type checker for AsyncGenerator
+
 

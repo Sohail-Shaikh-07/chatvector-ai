@@ -68,6 +68,7 @@ async def chat_stream(request: Request, payload: ChatRequest, auth: AuthContext 
             auth=auth,
         ),
         media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 

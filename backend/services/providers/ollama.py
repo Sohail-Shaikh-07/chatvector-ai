@@ -198,7 +198,7 @@ class OllamaLLMProvider(LLMProvider):
                         continue
                     try:
                         data = json.loads(line)
-                        if "response" in data:
+                        if data.get("response"):
                             yield data["response"]
                     except json.JSONDecodeError:
                         continue

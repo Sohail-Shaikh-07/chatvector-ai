@@ -420,7 +420,6 @@ async def test_answer_question_stream_for_document_error():
         async for chunk in answer_question_stream_for_document("q", "doc-1", match_count=5, auth=AuthContext()):
             chunks.append(chunk)
 
-        assert len(chunks) == 2
+        assert len(chunks) == 1
         assert chunks[0] == f"event: error\ndata: \"{LLM_MSG_RATE_LIMIT}\"\n\n"
-        assert chunks[1] == "event: done\ndata: [DONE]\n\n"
 
