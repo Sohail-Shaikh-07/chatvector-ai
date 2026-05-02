@@ -114,6 +114,7 @@ async def _retrieve_chunks_for_documents(
     doc_ids: list[str],
     query_embedding: list[float],
     match_count: int,
+    session_id: Optional[str] = None,
 ) -> list:
     retrieval_semaphore = _get_retrieval_semaphore()
 
@@ -123,6 +124,7 @@ async def _retrieve_chunks_for_documents(
                 doc_id=doc_id,
                 query_embedding=query_embedding,
                 match_count=match_count,
+                session_id=session_id,
             )
 
     per_document_chunks = await asyncio.gather(

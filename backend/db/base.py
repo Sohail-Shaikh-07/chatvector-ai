@@ -63,6 +63,7 @@ class DatabaseService(ABC):
         doc_id: str,
         query_embedding: list[float],
         match_count: int = 5,
+        session_id: Optional[str] = None,
     ) -> list[ChunkMatch]:
         """Run vector similarity search for chunks."""
         pass

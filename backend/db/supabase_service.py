@@ -2,7 +2,7 @@ import asyncio
 import logging
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from core.config import config
 from core.clients import supabase_client
@@ -225,8 +225,10 @@ class SupabaseService(DatabaseService):
         doc_id: str,
         query_embedding: list[float],
         match_count: int = 5,
+        session_id: Optional[str] = None,
     ) -> list[ChunkMatch]:
         """Find similar chunks using Supabase RPC."""
+        # TODO(Phase 3): use session_id for context filtering once implemented
         try:
             result = await self._run_io(
                 lambda: supabase_client.rpc(

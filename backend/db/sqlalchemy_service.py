@@ -4,6 +4,7 @@ import asyncio
 import time
 import uuid
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import delete, select, update as sql_update
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -234,8 +235,10 @@ class SQLAlchemyService(DatabaseService):
         doc_id: str,
         query_embedding: list[float],
         match_count: int = 5,
+        session_id: Optional[str] = None,
     ) -> list[ChunkMatch]:
         """Find similar chunks using pgvector."""
+        # TODO(Phase 3): use session_id for context filtering once implemented
         start = time.perf_counter()
         try:
             async with self._retrieval_semaphore:
