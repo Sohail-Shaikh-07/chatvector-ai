@@ -1,5 +1,6 @@
 import logging
 import asyncio
+from typing import Optional
 
 from core.config import config
 from db import find_similar_chunks
@@ -151,11 +152,12 @@ async def answer_question_for_document(
     question: str,
     doc_id: str,
     match_count: int = 5,
+    session_id: Optional[str] = None,
 ) -> dict:
     """
     Orchestrate the chat flow for a single question/document pair.
     """
-    logger.info(f"Starting chat for document {doc_id}")
+    logger.info(f"Starting chat for document {doc_id} (session={session_id})")
 
     transformed_queries = await transform_query(question)
     query_embeddings = await get_embeddings(transformed_queries)
@@ -275,6 +277,7 @@ async def answer_questions_for_documents_batch(
         query: dict, query_embeddings: list[list[float]]
     ) -> dict:
         try:
+            session_id = query.get("session_id")
             all_chunks: list = []
             seen_chunk_keys: set = set()
             for query_embedding in query_embeddings:
@@ -303,6 +306,7 @@ async def answer_questions_for_documents_batch(
                     "answer": answer,
                     "sources": sources,
                     "error": llm_err,
+                    "session_id": session_id,
                 }
 
             return {
@@ -312,6 +316,7 @@ async def answer_questions_for_documents_batch(
                 "chunks": len(matching_chunks),
                 "answer": answer,
                 "sources": sources,
+                "session_id": session_id,
             }
         except Exception:
             logger.exception(

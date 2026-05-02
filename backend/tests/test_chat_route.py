@@ -1,6 +1,6 @@
 import asyncio
 from fastapi import HTTPException
-from unittest.mock import AsyncMock, patch
+from unittest.mock import ANY, AsyncMock, patch
 
 from request_utils import make_test_request
 from routes.chat import ChatBatchItem, ChatBatchRequest, ChatRequest, chat, chat_batch
@@ -17,11 +17,14 @@ def test_chat_route_delegates_to_chat_service():
             chat(
                 make_test_request("POST", "/chat"),
                 ChatRequest(question="q", doc_id=_DOC_ID_1),
+                auth={},
             )
         )
 
     assert result == payload
-    mock_chat.assert_awaited_once_with(question="q", doc_id=_DOC_ID_1, match_count=5)
+    mock_chat.assert_awaited_once_with(
+        question="q", doc_id=_DOC_ID_1, match_count=5, session_id=ANY
+    )
 
 
 def test_chat_batch_route_delegates_to_chat_service():
@@ -38,12 +41,12 @@ def test_chat_batch_route_delegates_to_chat_service():
         new=AsyncMock(return_value=payload["results"]),
     ) as mock_batch:
         result = asyncio.run(
-            chat_batch(make_test_request("POST", "/chat/batch"), batch_request)
+            chat_batch(make_test_request("POST", "/chat/batch"), batch_request, auth={})
         )
 
     assert result == payload
     mock_batch.assert_awaited_once_with(
-        [{"question": "q", "doc_ids": [_DOC_ID_1], "match_count": 5}]
+        [{"question": "q", "doc_ids": [_DOC_ID_1], "match_count": 5, "session_id": ANY}]
     )
 
 
@@ -66,7 +69,7 @@ def test_chat_batch_route_counts_failures_and_successes():
         ),
     ):
         result = asyncio.run(
-            chat_batch(make_test_request("POST", "/chat/batch"), batch_request)
+            chat_batch(make_test_request("POST", "/chat/batch"), batch_request, auth={})
         )
 
     assert result["count"] == 2
@@ -83,7 +86,7 @@ def test_chat_batch_route_returns_422_for_value_error():
     ):
         try:
             asyncio.run(
-                chat_batch(make_test_request("POST", "/chat/batch"), batch_request)
+                chat_batch(make_test_request("POST", "/chat/batch"), batch_request, auth={})
             )
             raise AssertionError("Expected HTTPException was not raised")
         except HTTPException as exc:
